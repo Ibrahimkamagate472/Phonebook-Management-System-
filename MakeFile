@@ -1,0 +1,31 @@
+# Compiler and flags
+CXX = g++
+CXXFLAGS = -Wall -std=c++17 -g
+
+# Target executable name
+TARGET = main
+
+# Source files
+SRCS = main.cpp Phonebook.cpp
+
+# Object files
+OBJS = $(SRCS:.cpp=.o)
+
+# Default target
+all: $(TARGET)
+
+# Linking step
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+
+# Compilation step for each .cpp -> .o
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Clean build files
+clean:
+	rm -f $(OBJS) $(TARGET)
+
+# Run the program
+run: $(TARGET)
+	./$(TARGET)

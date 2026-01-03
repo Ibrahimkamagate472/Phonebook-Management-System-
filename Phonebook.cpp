@@ -47,7 +47,7 @@ int Phonebook::hash(const std::string& contact_name_, std::vector<entry>& table_
  * @return an int to the hash value of the string
  */
 int Phonebook::hashHelper(const std::string& contact_name_){
-    size_t hash_val_ = 0;
+    int hash_val_ = 0;
 
     for(char ch : contact_name_)
         hash_val_ = 37 * hash_val_ + ch;
@@ -136,7 +136,7 @@ bool Phonebook::add(const std::string& contact_name_, const std::string& num_){
 bool Phonebook::remove(const std::string& contact_name_){
     int j = 0;
 
-    size_t h = hashHelper(contact_name_.substr(0,3));
+    int h = hashHelper(contact_name_.substr(0,3));
     size_t hash1 = h % capacity_;
     size_t hash2 = R - (h % R);
 
@@ -165,5 +165,21 @@ bool Phonebook::remove(const std::string& contact_name_){
  * @return true or false if we found the contact or not
  */
 bool Phonebook::contains(const std::string& contact_name_){
+    int j = 0;    
+    int h = hashHelper(contact_name_.substr(0,3));
+    size_t hash1 = h % capacity_;
+    size_t hash2 = R - (h % R);
+
+    //keep going until we find it
+    while(j < capacity_){
+        //double hash function
+        size_t total_hash_ = (hash1 + j * hash2) % capacity_;
+
+        //checks if there is anything there
+        if(phonebook_[total_hash_].name_ == contact_name_){
+            return true;
+        }
+        j++;
+    }
     return false;
 }
