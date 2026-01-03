@@ -1,18 +1,21 @@
 #include "Phonebook.hpp"
 
-
 /**
- * @brief This is the default constructor
- * Sets the size of the hash table
+ * @brief this is the default constructor
  * 
- * Default capacity_ to 5  
- * Default R to 3
+ * default R to 3
+ * default capacity_ to 5  
+ * default size to 0
+ * default load factor to 0
+ * 
  */
-Phonebook::Phonebook(): capacity_(5), R(3), phonebook_(capacity_), size_(0), load_factor_(0){}
-
+Phonebook::Phonebook(): R(3), capacity_(5), size_(0), load_factor_(0), phonebook_(capacity_){}
 
 /**
- * @brief 
+ * @brief this function does double hash until we find an empty spot
+ * 
+ * @param const reference to a string of the contact name
+ * @param const reference to a the hash table we want to insert in
  * 
  * @return an int to where to insert the contact
  */
@@ -39,12 +42,11 @@ int Phonebook::hash(const std::string& contact_name_, std::vector<entry>& table_
 }
 
 /**
- * @brief This function is the helper function for rehash
- * retruns the hash value so we can double hash
+ * @brief this function hasehes strings using only the first three characters 
  * 
  * @param const reference to string of the item to be hashed
  * 
- * @return an int to the hash value of the string
+ * @return an int to the value preduced 
  */
 int Phonebook::hashHelper(const std::string& contact_name_){
     int hash_val_ = 0;
@@ -55,7 +57,7 @@ int Phonebook::hashHelper(const std::string& contact_name_){
 }
 
 /**
- * @brief This function rehashes when the load factor is too high
+ * @brief this function rehashes when the load factor is too high
  * 
  */
 void Phonebook::rehash(){
@@ -76,6 +78,14 @@ void Phonebook::rehash(){
     phonebook_ = std::move(new_table_);
 }
 
+/**
+ * @brief this function find the next prime number for our hash table.
+ * The hash table new capacity has to be at least twice the size of the old.
+ * 
+ * @param size_t reference to the new capacity
+ * 
+ * @return a new prime number for the capacity
+ */
 int Phonebook::findNextPrime(size_t& new_capacity_){
     //double the size of the old capacity and try to find the new prime
     new_capacity_ = (new_capacity_ * 2) + 1; 
@@ -93,6 +103,14 @@ int Phonebook::findNextPrime(size_t& new_capacity_){
     return new_capacity_;
 }
 
+/**
+ * @brief this fuction is the helper function for findNextPrime.
+ * It insures that the new capacity is prime.
+ * 
+ * @param size_t reference to the new capacity
+ * 
+ * @return true or false if the number is prime
+ */
 bool Phonebook::isPrime(size_t& new_capacity_){
     for (size_t i = 3; i * i <= new_capacity_; i += 2){
         if (new_capacity_ % i == 0){
@@ -103,9 +121,9 @@ bool Phonebook::isPrime(size_t& new_capacity_){
 }
 
 /**
- * @brief This function adds a contact
+ * @brief this function adds a contact
  * 
- * @param const reference of the string to the name of the contact that we have to add
+ * @param const reference to the string to the name of the contact that we have to add
  * @param const reference to an int for the number of the contact that we have to add
  * 
  * @return true or false if we added the contact or not
@@ -127,7 +145,7 @@ bool Phonebook::add(const std::string& contact_name_, const std::string& num_){
 }
 
 /**
- * @brief This function removes a contact using lazy deletion
+ * @brief this function removes a contact using lazy deletion
  * 
  * @param const reference to a string of the name of the contact that we have to remove
  * 
@@ -146,7 +164,7 @@ bool Phonebook::remove(const std::string& contact_name_){
         size_t total_hash_ = (hash1 + j * hash2) % capacity_;
 
         //checks if there is anything there
-        if(phonebook_[total_hash_].name_ == ""){
+        if(phonebook_[total_hash_].name_ == contact_name_){
             phonebook_[total_hash_].name_ = "x";
             size_--;
             load_factor_ = size_ / capacity_;
@@ -158,9 +176,9 @@ bool Phonebook::remove(const std::string& contact_name_){
 }
 
 /**
- * @brief This function checks to see if a contain is saved 
+ * @brief this function checks to see if a contain is saved 
  * 
- * @param const reference of a string to the name of the contact that we have to look for
+ * @param const reference to a string containing the name
  * 
  * @return true or false if we found the contact or not
  */
