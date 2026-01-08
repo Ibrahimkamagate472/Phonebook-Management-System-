@@ -4,18 +4,16 @@
 #ifndef PHONEBOOK_H
 #define PHONEBOOK_H
 
-
 struct entry{
-    std::string name_;
-    std::string number_;
+    std::string first_name_, last_name_, number_;
 };
+
 
 class Phonebook{
     private:
-        size_t R;
-        size_t capacity_;
+        size_t R, capacity_;
         int size_;
-        size_t load_factor_;
+        double load_factor_;
         std::vector<entry> phonebook_;
 
     public:
@@ -29,17 +27,100 @@ class Phonebook{
          * 
          */
         Phonebook();
+        
+        /** BASIC OPERATIONS **/
 
         /**
-         * @brief This function rehashes when the load factor is too high
+         * @brief this function adds a contact
+         * 
+         * @param const reference to a string containing the first name
+         * @param const reference to a string containing the last name
+         * @param const reference to a string containing the number
+         * 
+         * @return true or false if we added the contact or not
+         */
+        bool add(const std::string& first_name_, const std::string& last_name_, const std::string& num_);
+
+        /**
+         * @brief this function removes a contact using lazy deletion
+         * 
+         * @param const reference to a string containing the first name
+         * @param const reference to a string containing the last name
+         * 
+         * @return true or false if we remove the contact or not
+         */
+        bool remove(const std::string& first_name_, const std::string& last_name_);
+
+        /** 
+         * @brief this function finds the loaction for a contact
+         * 
+         * @param const reference to a string of the first name
+         * @param const reference to a string of the last name
+         */
+        int find(const std::string& first_name_, const std::string& last_name_);
+
+        /** FINDING PRIME NUMBER **/
+
+        /**
+         * @brief this function find the next prime number for our hash table.
+         * The hash table new capacity has to be at least twice the size of the old.
+         * 
+         * @param size_t reference to the new capacity
+         * 
+         * @return a new prime number for the capacity
+         */
+        int findNextPrime(size_t& new_capacity_, const std::string& indicator_);
+
+        /**
+         * @brief this fuction is the helper function for findNextPrime.
+         * It insures that the new capacity is prime.
+         * 
+         * @param size_t reference to the new capacity
+         * 
+         * @return true or false if the number is prime
+         */
+        bool isPrime(size_t& new_capacity_);
+
+        /** MUTATER **/
+        
+        /**
+         * @brief this function change the last name for a contact
+         * 
+         * @param const reference to a string of the old last name we have to update
+         * @param const reference to a string of the new last name we want to update
+         * 
+         * @return true or false if completed  
+         */
+        bool changeContactLastName(const std::string& first_name_, const std::string& old_last_name_, const std::string& new_last_name_);
+
+        /**
+         * @brief this function change the number for a contact
+         * 
+         * @param const reference to a string of the first name
+         * @param const reference to a string of the last name
+         * @param const reference to a string of the contact number we want to update
+         * 
+         * @return true or false if completed  
+         */
+        bool changeContactNumber(const std::string& first_name_, const std::string& last_name, const std::string& new_number_);
+
+        /** REHASHING AND HASHING **/
+
+        /**
+         * @brief this function rehashes when the load factor is too high
          * 
          */
-        void rehash();
+        void rehashUp();
+
+        /**
+         * @brief this function rehashes down when the load facotr is too low
+         */
+        void rehashDown();
 
         /**
          * @brief this function does double hash until we find an empty spot
          * 
-         * @param const reference to a string of the contact name
+         * @param const reference to a string of the first name
          * @param const reference to a the hash table we want to insert in
          * 
          * @return an int to where to insert the contact
@@ -55,53 +136,45 @@ class Phonebook{
          */
         int hashHelper(const std::string& contact_name_);
 
+
+        /** GETTERS **/
+        
         /**
-         * @brief this function checks to see if a contain is saved 
+         * @brief this function is a getter for phonebook
          * 
-         * @param const reference to a string containing the name
-         * 
-         * @return true or false if we found the contact or not
+         * @return return the vector that the phonebook is hashed into
          */
-        bool contains(const std::string& contact_name_);
+        std::vector<entry> getPhonebook()const;
 
         /**
-         * @brief this function adds a contact
+         * @brief this function gets the size of the phonebook
          * 
-         * @param const reference to a string to the name of the contact that we have to add
-         * @param const reference to an int for the number of the contact that we have to add
-         * 
-         * @return true or false if we added the contact or not
+         * @return an int to the size
          */
-        bool add(const std::string& contact_name_, const std::string& num_);
+        int getSize()const;
 
         /**
-         * @brief this function removes a contact using lazy deletion
+         * @brief this fuction gets the capacity of the current phonebook
          * 
-         * @param const reference to a string of the name of the contact that we have to remove
-         * 
-         * @return true or false if we remove the contact or not
+         * @return an int to the capacity
          */
-        bool remove(const std::string& contact_name_);
+        int getCapacity() const;
 
         /**
-         * @brief this function find the next prime number for our hash table.
-         * The hash table new capacity has to be at least twice the size of the old.
+         * @brief this function gets the load factor
          * 
-         * @param size_t reference to the new capacity
-         * 
-         * @return a new prime number for the capacity
+         * @return a double for tthe load factor
          */
-        int findNextPrime(size_t& new_capacity_);
+        double getLoadFactor() const;
 
         /**
-         * @brief this fuction is the helper function for findNextPrime.
-         * It insures that the new capacity is prime.
+         * @brief this function gets the number for a contain
          * 
-         * @param size_t reference to the new capacity
-         * 
-         * @return true or false if the number is prime
+         * @param const reference to a string of the first name
+         * @param const reference to a string of the last name
+         * @return a string containing the last name 
          */
-        bool isPrime(size_t& new_capacity_);
+        std::string getNumber(const std::string& first_name_, const std::string& last_name_);
 
 };
 #endif

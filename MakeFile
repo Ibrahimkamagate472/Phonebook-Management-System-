@@ -6,7 +6,7 @@ CXXFLAGS = -Wall -std=c++17 -g
 TARGET = main
 
 # Source files
-SRCS = main.cpp Phonebook.cpp
+SRCS = main.cpp Phonebook.cpp file.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
