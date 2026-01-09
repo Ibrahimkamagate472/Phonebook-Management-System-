@@ -49,8 +49,8 @@ void File::readFromFile(Phonebook& phonebook_){
 
         //extract the first and last name and their number
         std::string name_ = line_.substr(0, first_comma);
-        std::string name2_ = line_.substr(first_comma, second_comma);
-        std::string num_ = line_.substr(second_comma);
+        std::string name2_ = line_.substr(first_comma + 1, second_comma - first_comma - 1);
+        std::string num_ = line_.substr(second_comma + 1);
 
         //add it to the phonebook vector 
         phonebook_.add(name_, name2_, num_);
@@ -71,12 +71,12 @@ void File::readToFile(const Phonebook& phonebook_){
     for(const auto& i : phonebook_.getPhonebook()){
         
         //skip if there is no entry or we lazy deleted
-        if(i.first_name_.empty() || i.first_name_ == "x"){
+        if(i.first_name_.empty() || i.first_name_ ==  "x"){
             continue;
         }
 
         //adds it to the file
-        file_ << i.first_name_ << ", " << i.last_name_ << ", " << i.number_;
+        file_ << i.first_name_ << "," << i.last_name_ << "," << i.number_ << "\n";
     }
     file_.close();
 }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <iomanip>
 
 #ifndef PHONEBOOK_H
 #define PHONEBOOK_H
@@ -12,8 +13,7 @@ struct entry{
 class Phonebook{
     private:
         size_t R, capacity_;
-        int size_;
-        double load_factor_;
+        double size_, load_factor_;
         std::vector<entry> phonebook_;
 
     public:
@@ -163,7 +163,7 @@ class Phonebook{
         /**
          * @brief this function gets the load factor
          * 
-         * @return a double for tthe load factor
+         * @return a double for the load factor
          */
         double getLoadFactor() const;
 

@@ -310,7 +310,7 @@ int Phonebook::getCapacity() const{
 /**
  * @brief this function gets the load factor
  * 
- * @return a double for tthe load factor
+ * @return a double for the load factor
  */
 double Phonebook::getLoadFactor() const{
     return load_factor_;
@@ -329,5 +329,5 @@ std::string Phonebook::getNumber(const std::string& first_name_, const std::stri
     if(location_ > -1){
         return phonebook_[location_].number_;
     }
-    return ;
+    return "";
 }
