@@ -23,10 +23,6 @@ Phonebook::Phonebook(): R(3), capacity_(5), size_(0), load_factor_(0), phonebook
 * @return true or false if we added the contact or not
 */
 bool Phonebook::add(const std::string& first_name_, const std::string& last_name_,const std::string& num_){
-    //triggers rehashing
-    if(load_factor_ >= .6){
-        rehashUp();
-    }
     size_t location_ = hash(first_name_, phonebook_);
 
     //check if it is a valid location
@@ -36,6 +32,12 @@ bool Phonebook::add(const std::string& first_name_, const std::string& last_name
         phonebook_[location_].number_ = num_;
         size_++;
         load_factor_ = size_ / capacity_;
+
+        //if able to add, double check that the load factor isn't too high
+        if(load_factor_ >= .6){
+        rehashUp();
+        }
+        
         return true;
     }
     return false;
@@ -50,15 +52,17 @@ bool Phonebook::add(const std::string& first_name_, const std::string& last_name
  * @return true or false if we remove the contact or not
  */
 bool Phonebook::remove(const std::string& first_name_, const std::string& last_name_){
-    if(load_factor_ < .25){
-        rehashDown();
-    }
     int location_ = find(first_name_, last_name_);
 
     if(location_ > -1){
         phonebook_[location_].first_name_ = "x";
         size_--;
         load_factor_ = size_ / capacity_;
+
+        //if we was able to delete double check that the load factor isn't too low
+        if(load_factor_ < .25){
+            rehashDown();
+        }
         return true;
     }
     return false;
@@ -112,7 +116,7 @@ int Phonebook::findNextPrime(size_t& new_capacity_, const std::string& indicator
     }
 
     //time to update R for whenever we are adding to the new table
-    R = new_capacity_;
+    R = new_capacity_-2;
     while(!isPrime(R)){
         R -= 2;
     }
@@ -184,7 +188,8 @@ bool Phonebook::changeContactNumber(const std::string& first_name_, const std::s
 void Phonebook::rehashUp(){
     //makes the new hash table that is at least double the previous size
     capacity_ = (capacity_ * 2) + 1;
-    std::vector<entry> new_phonebook_(findNextPrime(capacity_, "up")); 
+    capacity_ = findNextPrime(capacity_, "up");
+    std::vector<entry> new_phonebook_(capacity_); 
 
     //loops throguh each item in the old phonebook and runs the hash fuction on it
     for(const auto& i : phonebook_){
@@ -205,6 +210,8 @@ void Phonebook::rehashUp(){
     }
     //reasgin the table
     phonebook_ = std::move(new_phonebook_);
+    //recalculate the new load factor 
+    load_factor_ = size_ / capacity_;
 }
 
 /**
@@ -233,6 +240,8 @@ void Phonebook::rehashDown(){
     }
     //reasgin the table
     phonebook_ = std::move(new_phonebook_);
+    //recalculate the new load factor 
+    load_factor_ = size_ / capacity_;
 }
 
 /**
@@ -249,6 +258,10 @@ int Phonebook::hash(const std::string& contact_name_, std::vector<entry>& table_
     size_t hash2 = R - (h % R);
     int j = 0;
 
+    if(hash2 == 0){
+        hash2 = 1;
+    }
+
     //keep going until we find a spot then we break
     while(j < capacity_){
         //double hash function
@@ -260,6 +273,21 @@ int Phonebook::hash(const std::string& contact_name_, std::vector<entry>& table_
         }
         j++;
     }    
+    std::cout << "/nfailed/n";
+    int i = 0;
+    while(i <= capacity_){
+        //double hash function
+        size_t total_hash_ = (hash1 + i * hash2) % capacity_;
+        std::cout << "\n******Trying to insert before if statement: " << hash1 << " " << i << " " << hash2  << " " << capacity_<< "\n";
+        std::cout << "\n" << (hash1 + i * hash2) % capacity_;
+        //checks if there is anything there
+        if(table_[total_hash_].first_name_.empty()){
+            std::cout << "\n******Trying to insert: " << total_hash_ << "\n";
+            return total_hash_;
+        }
+        i++;
+    }
+    std::cout << "\n*****failed: -1\n";
     return -1;
 }
 

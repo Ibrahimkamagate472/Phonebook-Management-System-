@@ -4,26 +4,33 @@
 int main(){
     Phonebook company_phonebook_;
     File company_file_;
-    std::string input_, first_name_, last_name_, num_, updated_last_name_, new_num_;
+    std::string input_, first_name_, last_name_, num_, updated_last_name_, updated_num_;
 
     //load up contacts from file
     company_file_.readFromFile(company_phonebook_);
 
     std::cout << "Hi, welcome to company phonebook.\n";
-    std::cout << "What would you like to do search, add, remove, update last name, and update number.\n";
+    std::cout << "What would you like to do search, add, remove, update last name, update number, or done to do noting.\n";
     std::getline(std::cin, input_);
 
     while(input_ != "done"){
         //gets persons phone number
         if(input_ == "search"){
-            std::cout << "What is the person you are looking for: ";
-            std::cin >> first_name_ >> last_name_;
+            std::cout << "First name: ";
+            std::getline(std::cin, first_name_);
+            std::cout << "Last name: ";
+            std::getline(std::cin, last_name_);
+
             std::cout << company_phonebook_.getNumber(first_name_, last_name_);
         }
         //adds a new person
         else if(input_ == "add"){
-            std::cout << "What is the first and last name, then the number: ";
-            std::cin >> first_name_ >> last_name_ >> num_;
+            std::cout << "First name: ";
+            std::getline(std::cin, first_name_);
+            std::cout << "Last name: ";
+            std::getline(std::cin, last_name_);
+            std::cout << "Phone number: ";
+            std::getline(std::cin, num_);
             std::cout << company_phonebook_.add(first_name_, last_name_, num_);
 
             //test
@@ -34,8 +41,11 @@ int main(){
         }
         //removes a person
         else if(input_ == "remove"){
-            std::cout << "What is the first and last name of the person that you want to remove: ";
-            std::cin >> first_name_ >> last_name_;
+            std::cout << "First name: ";
+            std::getline(std::cin, first_name_);
+            std::cout << "Last name: ";
+            std::getline(std::cin, last_name_);
+
             std::cout << company_phonebook_.remove(first_name_, last_name_);
 
 
@@ -47,16 +57,24 @@ int main(){
         }
         //updates last name
         else if(input_ == "update last name"){
-            std::cout << "What is the name of the person: ";
-            std::cin >> first_name_ >> last_name_;
-            std::cout << "\nWhat is the updated last name: ";
-            std::cin >> updated_last_name_;
+            std::cout << "First name: ";
+            std::getline(std::cin, first_name_);
+            std::cout << "Last name: ";
+            std::getline(std::cin, last_name_);
+            std::cout << "New last name: ";
+            std::getline(std::cin, updated_last_name_);
+
             std::cout << company_phonebook_.changeContactLastName(first_name_, last_name_, updated_last_name_);
 
         }else if(input_ == "update number"){
-            std::cout << "What is the name of the person number you want to update: ";
-            std::cin >> first_name_ >> last_name_;
-            std::cout << company_phonebook_.changeContactNumber(first_name_, last_name_, new_num_);
+            std::cout << "First name: ";
+            std::getline(std::cin, first_name_);
+            std::cout << "Last name: ";
+            std::getline(std::cin, last_name_);
+            std::cout << "New Phone number: ";
+            std::getline(std::cin, updated_num_);
+
+            std::cout << company_phonebook_.changeContactNumber(first_name_, last_name_, updated_num_);
 
         }else if(input_ == "done"){
             break;
@@ -65,7 +83,7 @@ int main(){
             std::cout << "That was not a valid input. Please try again.";
         }
 
-        std::cout << "\nWhat would you like to do search, add, remove, update last name, and update number.dfg\n";
+        std::cout << "\nWhat would you like to do search, add, remove, update last name, update number, or done to do noting.\n";
         std::getline(std::cin, input_);
     }
 

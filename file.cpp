@@ -11,8 +11,6 @@ File::File(): file_name_{"Phonebook.txt"}{
     std::ifstream file_(file_name_);
 
     if(!file_.is_open()){
-        file_.close();
-
         std::ofstream new_file_ (file_name_);
         new_file_.close();
     }
@@ -69,7 +67,6 @@ void File::readToFile(const Phonebook& phonebook_){
 
     //goes through each item in the phonebook
     for(const auto& i : phonebook_.getPhonebook()){
-        
         //skip if there is no entry or we lazy deleted
         if(i.first_name_.empty() || i.first_name_ ==  "x"){
             continue;
@@ -77,6 +74,7 @@ void File::readToFile(const Phonebook& phonebook_){
 
         //adds it to the file
         file_ << i.first_name_ << "," << i.last_name_ << "," << i.number_ << "\n";
+        // std::cout << i.first_name_ << "\n";
     }
     file_.close();
 }
