@@ -1,70 +1,98 @@
 #include "Phonebook.hpp"
+#include <cctype>
 
 /**
  * @brief this is the default constructor
  * 
  * default R to 3
  * default capacity_ to 5  
- * default size to 0
- * default load factor to 0
+ * default size_ to 0
+ * default load_factor_ to 0
+ * default lazy_deletion_size_ to 0
  * 
  */
-Phonebook::Phonebook(): R(3), capacity_(5), size_(0), load_factor_(0), phonebook_(capacity_){}
+Phonebook::Phonebook(): R(3), capacity_(5), size_(0), load_factor_(0), lazy_deletion_size_(0), phonebook_(capacity_){}
 
 /** BASIC OPERATIONS **/
 
 /**
- * @brief this function adds a contact
+ * @brief this function adds a contact.
 * 
 * @param const reference to a string containing the first name
 * @param const reference to a string containing the last name
 * @param const reference to a string containing the number
 * 
-* @return true or false if we added the contact or not
+* @return true or false if we added the contact
 */
 bool Phonebook::add(const std::string& first_name_, const std::string& last_name_,const std::string& num_){
+    //calls the hash functions and save the insert location
     size_t location_ = hash(first_name_, phonebook_);
 
-    //check if it is a valid location
-    if(location_ >= 0){
-        phonebook_[location_].first_name_ = first_name_;
-        phonebook_[location_].last_name_ = last_name_;
-        phonebook_[location_].number_ = num_;
+    //check if it is a valid location and insert
+    if(insert(location_, first_name_,last_name_, num_, phonebook_)){
         size_++;
         load_factor_ = size_ / capacity_;
-
         //if able to add, double check that the load factor isn't too high
         if(load_factor_ >= .6){
-        rehashUp();
+            rehashUp();
         }
-        
+        return true;
+    }
+
+    //if the contact was unable to be added 
+    return false;
+}
+
+/**
+ * @brief this function just inserts in the given location
+ * 
+ * @param const reference to an int to the location 
+ * @param const reference to a string containing the first name
+ * @param const reference to a string containing the last name
+ * @param const reference to a string containing the number
+ * @param reference to the phonebook that we will be inserting
+ * 
+ */
+bool Phonebook::insert(const int& location_, const std::string& first_name_, const std::string& last_name_, 
+const std::string& num_, std::vector<entry>& curr_phonebook){
+    if(location_ >= 0){
+        curr_phonebook[location_].first_name_ = first_name_;
+        curr_phonebook[location_].last_name_ = last_name_;
+        curr_phonebook[location_].number_ = num_;
         return true;
     }
     return false;
 }
 
 /**
- * @brief this function removes a contact using lazy deletion
+* @brief this function removes a contact using lazy deletion. Keeps track of 
+* number of lazy deletions to trigger rehashing if too many.
  * 
  * @param const reference to a string containing the first name
  * @param const reference to a string containing the last name
  * 
- * @return true or false if we remove the contact or not
+ * @return true or false if we remove the contact
  */
 bool Phonebook::remove(const std::string& first_name_, const std::string& last_name_){
-    int location_ = find(first_name_, last_name_);
+    //calls find and store location if found 
+    size_t location_ = find(first_name_, last_name_);
 
-    if(location_ > -1){
+    //double check location is a valid spot and set name to x as the flag
+    if(location_ >= 0 ){
         phonebook_[location_].first_name_ = "x";
         size_--;
+        lazy_deletion_size_++;
         load_factor_ = size_ / capacity_;
 
-        //if we was able to delete double check that the load factor isn't too low
-        if(load_factor_ < .25){
+        //checks if we did to many lazy deletion or if the load factor is too low
+        if(lazy_deletion_size_ / capacity_ > .3){
+            toManyLazyDeletion();
+        }else if(load_factor_ < .25){
             rehashDown();
         }
         return true;
     }
+    //if we were unable to remove the contact
     return false;
 }
 
@@ -151,6 +179,7 @@ bool Phonebook::isPrime(size_t& new_capacity_){
  * @return true or false if completed  
  */
 bool Phonebook::changeContactLastName(const std::string& first_name_, const std::string& old_last_name_, const std::string& new_last_name_){
+    //locate the contact
     int location_ = find(first_name_, old_last_name_);
 
     if(location_ > -1){
@@ -170,6 +199,7 @@ bool Phonebook::changeContactLastName(const std::string& first_name_, const std:
  * @return true or false if completed  
  */
 bool Phonebook::changeContactNumber(const std::string& first_name_, const std::string& last_name_, const std::string& new_number_){
+    //locates the contact
     int location_ = find(first_name_, last_name_);
 
     if(location_ > -1){
@@ -186,7 +216,7 @@ bool Phonebook::changeContactNumber(const std::string& first_name_, const std::s
  * 
  */
 void Phonebook::rehashUp(){
-    //makes the new hash table that is at least double the previous size
+    //makes a temp phonebook with a capacity that is new prime number at least twice the size as the old one
     capacity_ = (capacity_ * 2) + 1;
     capacity_ = findNextPrime(capacity_, "up");
     std::vector<entry> new_phonebook_(capacity_); 
@@ -201,12 +231,7 @@ void Phonebook::rehashUp(){
         //find the location to insert at
         size_t location_ = hash(i.first_name_, new_phonebook_);
 
-        //check to see if location is valid
-        if(location_ >= 0){
-            new_phonebook_[location_].first_name_ = i.first_name_;
-            new_phonebook_[location_].last_name_ = i.last_name_;
-            new_phonebook_[location_].number_ = i.number_;
-        }
+        insert(location_, i.first_name_, i.last_name_, i.number_, new_phonebook_);
     }
     //reasgin the table
     phonebook_ = std::move(new_phonebook_);
@@ -218,9 +243,10 @@ void Phonebook::rehashUp(){
  * @brief this function rehashes down when the load facotr is too low
  */
 void Phonebook::rehashDown(){
-    //makes a temp phonebook
+    //makes a temp phonebook with a capacity that is new prime number at least half the size as the old one
     capacity_ = (capacity_ / 2) + 1;
-    std::vector<entry> new_phonebook_(findNextPrime(capacity_, "down"));
+    capacity_ = findNextPrime(capacity_, "down");
+    std::vector<entry> new_phonebook_(capacity_);
 
     //loops through each item in vector
     for(const auto& i : phonebook_){
@@ -231,17 +257,28 @@ void Phonebook::rehashDown(){
         //finds a location to insert
         size_t location_ = hash(i.first_name_, new_phonebook_);
 
-        //double checks to see if location is valid
-        if(location_ >= 0){
-            new_phonebook_[location_].first_name_ = i.first_name_;
-            new_phonebook_[location_].last_name_ = i.last_name_;
-            new_phonebook_[location_].number_ = i.number_;
-        }
+        insert(location_, i.first_name_, i.last_name_, i.number_, new_phonebook_);
+
     }
     //reasgin the table
     phonebook_ = std::move(new_phonebook_);
     //recalculate the new load factor 
     load_factor_ = size_ / capacity_;
+}
+
+/**
+ * @brief this function rehashes when there were too many lazy deletion
+ */
+void Phonebook::toManyLazyDeletion(){
+    for(const auto& i : phonebook_){
+        //if deleted or nothing is there skip
+        if(i.first_name_ == "x" || i.first_name_.empty()){
+            continue;
+        }
+
+        size_t location_ = hash(i.first_name_, phonebook_);
+        insert(location_, i.first_name_, i.last_name_, i.number_, phonebook_);
+    }
 }
 
 /**
@@ -258,6 +295,7 @@ int Phonebook::hash(const std::string& contact_name_, std::vector<entry>& table_
     size_t hash2 = R - (h % R);
     int j = 0;
 
+    //if hash2 needs to be > 0
     if(hash2 == 0){
         hash2 = 1;
     }
@@ -272,22 +310,7 @@ int Phonebook::hash(const std::string& contact_name_, std::vector<entry>& table_
             return total_hash_;
         }
         j++;
-    }    
-    std::cout << "/nfailed/n";
-    int i = 0;
-    while(i <= capacity_){
-        //double hash function
-        size_t total_hash_ = (hash1 + i * hash2) % capacity_;
-        std::cout << "\n******Trying to insert before if statement: " << hash1 << " " << i << " " << hash2  << " " << capacity_<< "\n";
-        std::cout << "\n" << (hash1 + i * hash2) % capacity_;
-        //checks if there is anything there
-        if(table_[total_hash_].first_name_.empty()){
-            std::cout << "\n******Trying to insert: " << total_hash_ << "\n";
-            return total_hash_;
-        }
-        i++;
     }
-    std::cout << "\n*****failed: -1\n";
     return -1;
 }
 
@@ -296,11 +319,12 @@ int Phonebook::hash(const std::string& contact_name_, std::vector<entry>& table_
  * 
  * @param const reference to string of the item to be hashed
  * 
- * @return an int to the value preduced 
+ * @return an int to the value produced 
  */
 int Phonebook::hashHelper(const std::string& contact_name_){
     int hash_val_ = 0;
 
+    //k3 +37(k2 + 37(k1 +37k0))
     for(char ch : contact_name_)
         hash_val_ = 37 * hash_val_ + ch;
     return hash_val_;
@@ -349,13 +373,16 @@ double Phonebook::getLoadFactor() const{
  * 
  * @param const reference to a string of the first name
  * @param const reference to a string of the last name
+ * 
  * @return a string containing the last name 
  */
 std::string Phonebook::getNumber(const std::string& first_name_, const std::string& last_name_){
+    //calls find function and save location if found
     int location_ = find(first_name_, last_name_);
 
     if(location_ > -1){
-        return phonebook_[location_].number_;
+        return "The person you are looking for number is: " + phonebook_[location_].number_;
     }
-    return "";
+
+    return  "Unable to find the person you are looking for.";
 }

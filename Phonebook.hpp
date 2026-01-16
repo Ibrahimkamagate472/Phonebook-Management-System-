@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <iomanip>
+#include <string>
+#include <cctype>
 
 #ifndef PHONEBOOK_H
 #define PHONEBOOK_H
@@ -13,7 +15,7 @@ struct entry{
 class Phonebook{
     private:
         size_t R, capacity_;
-        double size_, load_factor_;
+        double size_, load_factor_, lazy_deletion_size_;
         std::vector<entry> phonebook_;
 
     public:
@@ -22,8 +24,9 @@ class Phonebook{
          * 
          * default R to 3
          * default capacity_ to 5  
-         * default size to 0
-         * default load factor to 0
+         * default size_ to 0
+         * default load_factor_ to 0
+         * default lazy_deletion_size_ to 0
          * 
          */
         Phonebook();
@@ -31,23 +34,37 @@ class Phonebook{
         /** BASIC OPERATIONS **/
 
         /**
-         * @brief this function adds a contact
+         * @brief this function adds a contact.
          * 
          * @param const reference to a string containing the first name
          * @param const reference to a string containing the last name
          * @param const reference to a string containing the number
          * 
-         * @return true or false if we added the contact or not
+         * @return true or false if we added the contact
          */
         bool add(const std::string& first_name_, const std::string& last_name_, const std::string& num_);
 
         /**
-         * @brief this function removes a contact using lazy deletion
+         * @brief this function just inserts in the given location
+         * 
+         * @param const reference to an int to the location 
+         * @param const reference to a string containing the first name
+         * @param const reference to a string containing the last name
+         * @param const reference to a string containing the number
+         * @param reference to the phonebook that we will be inserting
+         * 
+         */
+        bool insert(const int& location_, const std::string& first_name_, const std::string& last_name_, 
+            const std::string& num_, std::vector<entry>& curr_phonebook);
+
+        /**
+         * @brief this function removes a contact using lazy deletion. Keeps track of 
+         * number of lazy deletions to trigger rehashing if too many.
          * 
          * @param const reference to a string containing the first name
          * @param const reference to a string containing the last name
          * 
-         * @return true or false if we remove the contact or not
+         * @return true or false if we remove the contact
          */
         bool remove(const std::string& first_name_, const std::string& last_name_);
 
@@ -118,6 +135,11 @@ class Phonebook{
         void rehashDown();
 
         /**
+         * @brief this function rehashes when there were too many lazy deletion
+         */
+        void toManyLazyDeletion();
+
+        /**
          * @brief this function does double hash until we find an empty spot
          * 
          * @param const reference to a string of the first name
@@ -132,7 +154,7 @@ class Phonebook{
          * 
          * @param const reference to string of the item to be hashed
          * 
-         * @return an int to the value preduced 
+         * @return an int to the value produced 
          */
         int hashHelper(const std::string& contact_name_);
 
@@ -172,6 +194,7 @@ class Phonebook{
          * 
          * @param const reference to a string of the first name
          * @param const reference to a string of the last name
+         * 
          * @return a string containing the last name 
          */
         std::string getNumber(const std::string& first_name_, const std::string& last_name_);
