@@ -83,6 +83,7 @@ class Phonebook{
          * The hash table new capacity has to be at least twice the size of the old.
          * 
          * @param size_t reference to the new capacity
+         * @param const reference to a string to indicate if we going up or down
          * 
          * @return a new prime number for the capacity
          */

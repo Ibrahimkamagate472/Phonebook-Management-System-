@@ -26,7 +26,7 @@ int main(){
     //load up contacts from file
     company_file_.readFromFile(company_phonebook_);
 
-    std::cout << "Hi, welcome to Phonebook Mangement System.\n";
+    std::cout << "Hi, welcome to Phonebook Management System.\n";
     std::cout << "What would you like to do search, add, remove, update last name, update number, or done to do noting.\n";
     std::getline(std::cin, input_);
 

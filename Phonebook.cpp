@@ -97,7 +97,7 @@ bool Phonebook::remove(const std::string& first_name_, const std::string& last_n
 }
 
 /** 
- * @brief this function finds the loaction for a contact
+ * @brief this function finds the loaction of a contact
  * 
  * @param const reference to a string of the first name
  * @param const reference to a string of the last name
@@ -130,6 +130,7 @@ int Phonebook::find(const std::string& first_name_, const std::string& last_name
  * The hash table new capacity has to be at least twice the size of the old.
  * 
  * @param size_t reference to the new capacity
+ * @param const reference to a string to indicate if we going up or down
  * 
  * @return a new prime number for the capacity
  */
@@ -171,7 +172,7 @@ bool Phonebook::isPrime(size_t& new_capacity_){
 /** MUTATER **/
 
 /**
- * @brief this function change the name for a contact
+ * @brief this function change the last name for a contact
  * 
  * @param const reference to a string of the old last name we have to update
  * @param const reference to a string of the new last name we want to update
